@@ -1,0 +1,27 @@
+[Unit]
+Description=Marzlive Upgrade Media Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=marzlive
+Group=marzlive
+WorkingDirectory=/opt/marzlive_upgrade
+EnvironmentFile=/opt/marzlive_upgrade/.env
+Environment=MEDIA_WORKER_BACKEND=local
+Environment=MEDIA_WORKER_INTERVAL_SECONDS=5
+ExecStart=/opt/marzlive_upgrade/.venv/bin/python scripts/media_worker_once.py --backend ${MEDIA_WORKER_BACKEND} --loop --interval-seconds ${MEDIA_WORKER_INTERVAL_SECONDS}
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/marzlive_upgrade/data/media
+
+[Install]
+WantedBy=multi-user.target

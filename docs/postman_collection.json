@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "marzlive_upgrade quick test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8888" },
+    { "key": "googleIdToken", "value": "" },
+    { "key": "targetUserId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Login (Google)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_token\": \"{{googleIdToken}}\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Create Post",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Hello from Postman\",\n  \"media_type\": \"text\"\n}"
+        },
+        "url": "{{baseUrl}}/posts"
+      }
+    },
+    {
+      "name": "Follow User",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"target_user_id\": \"{{targetUserId}}\"\n}"
+        },
+        "url": "{{baseUrl}}/social/follow"
+      }
+    },
+    {
+      "name": "Feed",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/feed?limit=20&offset=0"
+      }
+    },
+    {
+      "name": "Unfollow User",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"target_user_id\": \"{{targetUserId}}\"\n}"
+        },
+        "url": "{{baseUrl}}/social/unfollow"
+      }
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/auth/logout"
+      }
+    }
+  ]
+}
