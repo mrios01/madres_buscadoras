@@ -1,0 +1,70 @@
+.hero-title {
+  background: linear-gradient(90deg, #e99ccc 0%, #d96ab4 100%);
+  color: #4e2453;
+  padding: 1rem 0.8rem;
+  border-radius: 8px;
+  margin: 0 0.75rem;
+}
+
+.hero-title .display-4 {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.hero-title .lead {
+  margin-bottom: 0;
+  color: #5d3562;
+}
+
+.missing-tabs .nav-link {
+  color: #bc72a0;
+  font-weight: 600;
+}
+
+.missing-tabs .nav-link.active {
+  color: #fff;
+  background-color: #da80b4;
+  border-color: #da80b4 #da80b4 #f2d4e7;
+}
+
+.missing-card {
+  border: 1px solid #ead3e2;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.9rem;
+  box-shadow: 0 10px 25px rgba(117, 43, 88, 0.08);
+}
+
+.missing-card h2 {
+  margin: 0 0 0.8rem;
+  color: #ca5498;
+  font-size: 1.45rem;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.missing-card img {
+  width: 100%;
+  border: 1px solid #6a5a67;
+  border-radius: 6px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.missing-card p {
+  margin-top: 0.75rem;
+  color: #704f65;
+}
+
+.text-update {
+  border: 1px solid #ecd7e4;
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.text-update h3 {
+  color: #bc4d91;
+  margin-bottom: 0.45rem;
+}

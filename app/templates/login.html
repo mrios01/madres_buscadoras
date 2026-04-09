@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Madres Buscadoras | Iniciar sesion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/login.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <main class="login-shell">
+      <section class="hero-card">
+        <p class="eyebrow">Red comunitaria</p>
+        <h1>Madres Buscadoras</h1>
+        <p class="lead">
+          Plataforma social para visibilizar perfiles de personas desaparecidas,
+          coordinar busquedas y fortalecer redes de apoyo.
+        </p>
+        <ul class="feature-list">
+          <li>Perfiles de busqueda centralizados</li>
+          <li>Actualizaciones en tiempo real por colectivo</li>
+          <li>Canal seguro de colaboracion comunitaria</li>
+        </ul>
+      </section>
+
+      <section class="auth-card">
+        <h2>Iniciar sesion</h2>
+        <p class="subtext">Accede para publicar y seguir perfiles de busqueda.</p>
+
+        <div
+          id="g_id_onload"
+          data-client_id="{{ google_client_id }}"
+          data-context="signin"
+          data-callback="onGoogleCredential"
+          data-auto_prompt="false"
+        ></div>
+        <div class="g_id_signin" data-type="standard" data-theme="outline"></div>
+
+        <button id="previewButton" class="preview-btn" type="button">
+          Entrar a vista previa
+        </button>
+
+        <p id="status" class="status"></p>
+      </section>
+    </main>
+
+    <script src="/static/js/login.js"></script>
+  </body>
+</html>

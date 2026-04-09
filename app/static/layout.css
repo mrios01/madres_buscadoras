@@ -1,0 +1,33 @@
+body {
+  background:
+    radial-gradient(1200px 400px at 10% -20%, #ffeaf7, transparent 70%),
+    linear-gradient(180deg, #fff 0%, #fffafe 100%);
+}
+
+.main-header {
+  background: #ffffffde;
+  backdrop-filter: blur(6px);
+}
+
+.brand-link {
+  color: #7f2d67;
+}
+
+.brand-name {
+  font-family: "Alex Brush", cursive;
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.secondary-nav .nav-link {
+  color: #9e6e93;
+  font-weight: 600;
+}
+
+.secondary-nav .nav-link.active {
+  color: #ca3f95;
+}
+
+.footer-label {
+  font-weight: 700;
+}
