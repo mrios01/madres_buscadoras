@@ -8,6 +8,7 @@ from app.services.auth import (
     revoke_session,
     verify_google_id_token,
 )
+from app.services.recaptcha import verify_recaptcha_v3
 
 
 def _serialize_user(doc: dict) -> dict:
@@ -39,6 +40,16 @@ def _serialize_user(doc: dict) -> dict:
     }
 
 
+def _as_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    if isinstance(value, (int, float)):
+        return value != 0
+    return False
+
+
 class RegisterHandler(tornado.web.RequestHandler):
     async def post(self):
         self.set_status(405)
@@ -58,6 +69,38 @@ class LoginHandler(tornado.web.RequestHandler):
         except Exception:
             self.set_status(400)
             self.finish({"error": "invalid_json"})
+            return
+
+        accepted_terms = _as_bool(
+            payload.get("accept_terms", payload.get("acceptTerms"))
+        )
+        accepted_privacy = _as_bool(
+            payload.get("accept_privacy", payload.get("acceptPrivacy"))
+        )
+        if not accepted_terms or not accepted_privacy:
+            self.set_status(400)
+            self.finish({"error": "legal_consent_required"})
+            return
+
+        recaptcha_token = str(payload.get("recaptcha_token") or "")
+        if not recaptcha_token:
+            self.set_status(400)
+            self.finish({"error": "recaptcha_token_required"})
+            return
+
+        try:
+            await verify_recaptcha_v3(
+                token=recaptcha_token,
+                expected_action="auth_login",
+                remote_ip=self.request.remote_ip,
+            )
+        except RuntimeError as exc:
+            self.set_status(503)
+            self.finish({"error": str(exc)})
+            return
+        except ValueError as exc:
+            self.set_status(403)
+            self.finish({"error": str(exc)})
             return
 
         google_id_token = payload.get("id_token", "")

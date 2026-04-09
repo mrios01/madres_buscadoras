@@ -190,7 +190,17 @@ async def get_user_by_session_token(db, token: str) -> dict | None:
     if not session:
         return None
 
-    if session.get("expires_at") and session["expires_at"] < _utcnow():
+    expires_at = session.get("expires_at")
+    if expires_at and isinstance(expires_at, datetime):
+        if expires_at.tzinfo is None:
+            # Mongo may return naive UTC datetimes depending on codec options.
+            expires_at = expires_at.replace(tzinfo=UTC)
+
+        if expires_at < _utcnow():
+            await db.sessions.delete_one({"_id": session["_id"]})
+            return None
+
+    elif expires_at:
         await db.sessions.delete_one({"_id": session["_id"]})
         return None
 

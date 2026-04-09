@@ -1,0 +1,148 @@
+{% extends "_layout.html" %}
+
+{% block title %}Agregar Perfil de Desaparecido{% end %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/missing_person_create.css?v={{ static_version }}" />
+{% end %}
+
+{% block content %}
+<section class="container create-shell">
+  <header class="create-header">
+    <h1>Captura de Expediente</h1>
+    <p>
+      Esta pantalla separa físicamente información pública (Nivel 0) de información restringida (Nivel 2).
+    </p>
+  </header>
+
+  <form id="missingPersonForm" class="create-grid" novalidate>
+    <article class="tier-card tier-public">
+      <h2>Nivel 0: Ficha Pública</h2>
+      <p class="tier-intro">
+        Esta información podrá compartirse en fichas de búsqueda públicas. No incluyas coordenadas exactas ni datos operativos.
+      </p>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label for="firstName">Nombre(s)</label>
+          <input id="firstName" type="text" required />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Apellidos</label>
+          <input id="lastName" type="text" required />
+        </div>
+      </div>
+
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label for="age">Edad al desaparecer</label>
+          <input id="age" type="number" min="0" max="120" required />
+        </div>
+        <div class="form-group">
+          <label for="gender">Género</label>
+          <input id="gender" type="text" placeholder="Ej. Femenino" required />
+        </div>
+        <div class="form-group">
+          <label for="dateMissing">Fecha de desaparición</label>
+          <input id="dateMissing" type="date" required />
+        </div>
+      </div>
+
+      <fieldset class="location-box">
+        <legend>Última ubicación conocida (texto, sin pin GPS)</legend>
+        <div class="form-row three-col">
+          <div class="form-group">
+            <label for="state">Estado</label>
+            <input id="state" type="text" placeholder="Ej. Jalisco" required />
+          </div>
+          <div class="form-group">
+            <label for="city">Municipio / Ciudad</label>
+            <input id="city" type="text" placeholder="Ej. Zapopan" required />
+          </div>
+          <div class="form-group">
+            <label for="neighborhood">Zona / Colonia</label>
+            <input id="neighborhood" type="text" placeholder="Ej. Centro de Zapopan" required />
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label for="heightCm">Estatura (cm) opcional</label>
+          <input id="heightCm" type="number" min="30" max="260" />
+        </div>
+        <div class="form-group">
+          <label for="weightKg">Peso (kg) opcional</label>
+          <input id="weightKg" type="number" min="2" max="350" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="clothingLastSeen">Vestimenta al momento de desaparición</label>
+        <textarea id="clothingLastSeen" rows="3" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="identifyingMarks">Señas particulares (una por línea, opcional)</label>
+        <textarea id="identifyingMarks" rows="3" placeholder="Ej. Tatuaje en antebrazo derecho"></textarea>
+      </div>
+
+        <div class="form-group">
+          <label for="primaryImageFile">Imagen principal (se sube a GCS)</label>
+          <input id="primaryImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required />
+        </div>
+    </article>
+
+    <article class="tier-card tier-private">
+      <div class="restricted-header">Nivel 2: Dossier Privado Restringido</div>
+      <p class="tier-intro">
+        Esta información es interna del colectivo y familia. No será publicada en ficha pública.
+      </p>
+
+      <div class="ack-box">
+        <label class="ack-label" for="ackPrivate">
+          <input id="ackPrivate" type="checkbox" />
+          Confirmo que entiendo que este bloque contiene datos operativos sensibles.
+        </label>
+      </div>
+
+      <fieldset id="privateFieldset" disabled>
+        <div class="form-group">
+          <label for="officialCaseNumber">Número de carpeta de investigación</label>
+          <input id="officialCaseNumber" type="text" placeholder="Si no existe, usa N/D" required />
+        </div>
+
+        <div class="form-group inline-check">
+          <input id="dnaSampleRegistered" type="checkbox" />
+          <label for="dnaSampleRegistered">¿La familia ya aportó muestra de ADN?</label>
+        </div>
+
+        <div class="form-group">
+          <label for="suspectedContext">Contexto de desaparición / sospechas</label>
+          <textarea id="suspectedContext" rows="4" required></textarea>
+          <small class="danger-note">No publiques estos detalles en redes sociales.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="internalNotes">Notas internas del colectivo</label>
+          <textarea id="internalNotes" rows="4" required></textarea>
+        </div>
+      </fieldset>
+    </article>
+
+    <div class="submit-row">
+      <button type="submit">Cifrar y Guardar Expediente</button>
+      <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+    </div>
+  </form>
+
+  <section class="payload-preview">
+    <h3>Payload generado (simulación)</h3>
+    <pre id="jsonOutput"></pre>
+  </section>
+</section>
+{% end %}
+
+{% block scripts %}
+<script src="/static/js/missing_person_create.js?v={{ static_version }}"></script>
+{% end %}

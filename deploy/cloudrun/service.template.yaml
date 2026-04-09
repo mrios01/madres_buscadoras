@@ -1,0 +1,96 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: madres-buscadoras-web
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: __SERVICE_ACCOUNT__
+      containers:
+        - image: __IMAGE__
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          env:
+            - name: APP_ENV
+              value: production
+            - name: APP_PORT
+              value: "8080"
+            - name: DEBUG
+              value: "false"
+            - name: MONGODB_DBNAME
+              value: madres_buscadoras
+            - name: MEDIA_BACKEND
+              value: gcs
+            - name: GCS_PROJECT_ID
+              value: __GCP_PROJECT_ID__
+            - name: GCS_BUCKET
+              value: __GCS_BUCKET__
+            - name: GCS_SIGNED_URL_TTL_SECONDS
+              value: "3600"
+            - name: MEDIA_PUBLIC_BASE_URL
+              value: https://madresbuscadoras.zocalo.media/media
+            - name: AUTH_COOKIE_NAME
+              value: mb_session
+            - name: AUTH_COOKIE_SECURE
+              value: "true"
+            - name: AUTH_COOKIE_SAMESITE
+              value: strict
+            - name: AUTH_SESSION_TTL_DAYS
+              value: "14"
+            - name: BULLETIN_PUBSUB_ENABLED
+              value: "__BULLETIN_PUBSUB_ENABLED__"
+            - name: BULLETIN_PROJECT_ID
+              value: __BULLETIN_PROJECT_ID__
+            - name: BULLETIN_TOPIC_ID
+              value: __BULLETIN_TOPIC_ID__
+            - name: BULLETIN_SUBSCRIPTION_ID
+              value: __BULLETIN_SUBSCRIPTION_ID__
+            - name: GOOGLE_CLIENT_ID
+              value: __GOOGLE_CLIENT_ID__
+            - name: RECAPTCHA_SITE_KEY
+              value: __RECAPTCHA_SITE_KEY__
+            - name: RECAPTCHA_PROJECT_ID
+              value: __RECAPTCHA_PROJECT_ID__
+            - name: RECAPTCHA_MIN_SCORE
+              value: "__RECAPTCHA_MIN_SCORE__"
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: __GOOGLE_CLIENT_SECRET_NAME__
+                  key: latest
+            - name: RECAPTCHA_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: __RECAPTCHA_SECRET_NAME__
+                  key: latest
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: __MONGODB_URI_SECRET_NAME__
+                  key: latest
+            - name: COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: __COOKIE_SECRET_NAME__
+                  key: latest
+            - name: PASSWORD_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: __PASSWORD_SALT_SECRET_NAME__
+                  key: latest
+  traffic:
+    - percent: 100
+      latestRevision: true

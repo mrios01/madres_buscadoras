@@ -1,0 +1,59 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT_ID: moanarkrocks
+  REGION: us-central1
+  SERVICE_NAME: madres-buscadoras-web
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCLOUD_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Create .env file from secrets
+        run: |
+          cat > .env <<EOF
+          APP_ENV=production
+          APP_PORT=8080
+          DEBUG=false
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          MONGODB_DBNAME=madres_buscadoras
+          COOKIE_SECRET=${{ secrets.COOKIE_SECRET }}
+          PASSWORD_SALT=${{ secrets.PASSWORD_SALT }}
+          AUTH_COOKIE_NAME=mb_session
+          AUTH_COOKIE_SECURE=true
+          AUTH_COOKIE_SAMESITE=strict
+          AUTH_SESSION_TTL_DAYS=14
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          MEDIA_BACKEND=gcs
+          GCS_PROJECT_ID=${{ env.GCP_PROJECT_ID }}
+          GCS_BUCKET=${{ secrets.GCS_BUCKET }}
+          GCS_SIGNED_URL_TTL_SECONDS=3600
+          MEDIA_PUBLIC_BASE_URL=https://madresbuscadoras.zocalo.media/media
+          EOF
+
+      - name: Run Cloud Run deployment
+        run: |
+          export GCS_PROJECT_ID="${{ env.GCP_PROJECT_ID }}"
+          ${{ github.workspace }}/scripts/deploy_cloud_run.sh

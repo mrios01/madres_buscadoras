@@ -1,12 +1,24 @@
+import tornado.escape
 import tornado.web
 
+from app.api._auth import SessionAwareHandler
 from app.core.config import get_settings
+from app.services.missing_persons import list_public_missing_persons
 
 
 class GoogleAuthDemoHandler(tornado.web.RequestHandler):
     async def get(self):
         settings = get_settings()
         client_id = settings.google_client_id or ""
+        recaptcha_site_key = settings.recaptcha_site_key or ""
+        recaptcha_script = (
+            ""
+            if not recaptcha_site_key
+            else (
+                "<script src='https://www.google.com/recaptcha/api.js"
+                f"?render={recaptcha_site_key}'></script>"
+            )
+        )
 
         html = f"""<!doctype html>
 <html>
@@ -15,6 +27,7 @@ class GoogleAuthDemoHandler(tornado.web.RequestHandler):
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <title>Marzlive Google Auth Demo</title>
     <script src='https://accounts.google.com/gsi/client' async defer></script>
+    {recaptcha_script}
     <style>
       body {{
         font-family: system-ui, sans-serif;
@@ -61,10 +74,27 @@ class GoogleAuthDemoHandler(tornado.web.RequestHandler):
 
       async function onGoogleCredential(response) {{
         try {{
+          let recaptchaToken = '';
+          if ('{recaptcha_site_key}') {{
+            if (!window.grecaptcha) {{
+              out.textContent = 'Missing grecaptcha global';
+              return;
+            }}
+            recaptchaToken = await window.grecaptcha.execute(
+              '{recaptcha_site_key}',
+              {{ action: 'auth_login' }}
+            );
+          }}
+
           const r = await fetch('/auth/login', {{
             method: 'POST',
             headers: {{ 'Content-Type': 'application/json' }},
-            body: JSON.stringify({{ id_token: response.credential }})
+            body: JSON.stringify({{
+              id_token: response.credential,
+              accept_terms: true,
+              accept_privacy: true,
+              recaptcha_token: recaptchaToken,
+            }})
           }});
           const text = await r.text();
           out.textContent = `STATUS ${{r.status}}\n${{text}}`;
@@ -86,72 +116,112 @@ class GoogleAuthDemoHandler(tornado.web.RequestHandler):
         self.finish(html)
 
 
-class LoginPageHandler(tornado.web.RequestHandler):
+class LoginPageHandler(SessionAwareHandler):
     async def get(self):
         settings = get_settings()
         self.render(
             "login.html",
             google_client_id=settings.google_client_id or "",
+            recaptcha_site_key=settings.recaptcha_site_key or "",
+          static_version="20260409-6",
         )
 
 
-class MissingProfilesPageHandler(tornado.web.RequestHandler):
+class MissingProfilesPageHandler(SessionAwareHandler):
     async def get(self):
-        cards = [
-            {
-                "title": "Amor en tiempo de Coronavirus",
-                "description": "Busqueda de contacto en zona metropolitana.",
-                "image": (
-                    "https://images.unsplash.com/photo-1516589178581-"
-                    "6cd7833ae3b2?auto=format&fit=crop&w=900&q=80"
-                ),
-                "kind": "images",
-            },
-            {
-                "title": "Lo que mas me gusta de estas fechas",
-                "description": (
-                    "Ficha comunitaria para rastreo por puntos clave."
-                ),
-                "image": (
-                    "https://images.unsplash.com/photo-1531968455001-"
-                    "5c5272a41129?auto=format&fit=crop&w=900&q=80"
-                ),
-                "kind": "images",
-            },
-            {
-                "title": "Catrina floral",
-                "description": (
-                    "Perfil visual con senas particulares y redes de apoyo."
-                ),
-                "image": (
-                    "https://images.unsplash.com/photo-1544717305-"
-                    "2782549b5136?auto=format&fit=crop&w=900&q=80"
-                ),
-                "kind": "images",
-            },
-            {
-                "title": "Video de ubicacion reciente",
-                "description": (
-                    "Testimonio audiovisual de posible avistamiento."
-                ),
-                "image": (
-                    "https://images.unsplash.com/photo-1492691527719-"
-                    "9d1e07e534b4?auto=format&fit=crop&w=900&q=80"
-                ),
-                "kind": "videos",
-            },
-            {
-                "title": "Actualizacion de brigada",
-                "description": (
-                    "Texto con nuevas rutas y coordenadas de busqueda."
-                ),
-                "image": (
-                    "https://images.unsplash.com/photo-1454165804606-"
-                    "c3d57bc86b40?auto=format&fit=crop&w=900&q=80"
-                ),
-                "kind": "texts",
-            },
-        ]
+        db = self.application.settings["db"]
+        settings = get_settings()
+        gcs_prefix = ""
+        if settings.gcs_bucket:
+            gcs_prefix = (
+                "https://storage.googleapis.com/"
+                f"{settings.gcs_bucket}/"
+            )
+
+        # Check if user needs to acknowledge security agreement
+        if self.current_user:
+            user_id = self.current_user.get("_id")
+            user_doc = await db.users.find_one({"_id": user_id})
+
+            if user_doc and not user_doc.get(
+                "security_agreement_acknowledged_at"
+            ):
+                self.redirect("/security-agreement")
+                return
+
+        docs = await list_public_missing_persons(
+            db,
+            limit=60,
+            offset=0,
+            status=None,
+        )
+
+        cards: list[dict] = []
+        for doc in docs:
+            public = doc.get("public_ficha") or {}
+            location = public.get("location_last_seen") or {}
+            physical = public.get("physical_description") or {}
+            first_name = str(public.get("first_name") or "").strip()
+            last_name = str(public.get("last_name") or "").strip()
+            display_name = (
+                f"{first_name} {last_name}".strip()
+                or "Perfil sin nombre"
+            )
+            date_missing = str(public.get("date_missing") or "").split("T")[0]
+            city = str(location.get("city") or "").strip()
+            state = str(location.get("state") or "").strip()
+            image_url = str(public.get("primary_image_url") or "").strip()
+            neighborhood = str(location.get("neighborhood") or "").strip()
+            age = public.get("age_at_disappearance")
+            gender = str(public.get("gender") or "").strip()
+            height_cm = physical.get("height_cm")
+            weight_kg = physical.get("weight_kg")
+            identifying_marks = list(physical.get("identifying_marks") or [])
+            clothing_last_seen = str(physical.get("clothing_last_seen") or "").strip()
+            profile_id = str(doc.get("_id") or "")
+            status = str(doc.get("status") or "ACTIVE_SEARCH")
+
+            if not image_url:
+                continue
+
+            if gcs_prefix and image_url.startswith(gcs_prefix):
+                object_key = image_url.removeprefix(gcs_prefix)
+                if object_key:
+                    escaped = tornado.escape.url_escape(
+                        object_key,
+                        plus=False,
+                    )
+                    image_url = (
+                        "/missing-persons/image-proxy?object_key="
+                        f"{escaped}"
+                    )
+
+            description_parts = [
+                f"Desaparecio: {date_missing}" if date_missing else "",
+                f"Zona: {city}, {state}" if city or state else "",
+            ]
+            description = " | ".join([p for p in description_parts if p])
+
+            cards.append(
+                {
+                    "profile_id": profile_id,
+                    "title": display_name,
+                    "description": description,
+                    "image": image_url,
+                    "kind": "images",
+                    "date_missing": date_missing,
+                    "city": city,
+                    "state": state,
+                    "neighborhood": neighborhood,
+                    "age": age,
+                    "gender": gender,
+                    "height_cm": height_cm,
+                    "weight_kg": weight_kg,
+                    "identifying_marks": identifying_marks,
+                    "clothing_last_seen": clothing_last_seen,
+                    "status": status,
+                }
+            )
 
         self.render(
             "missing_profiles.html",
@@ -160,4 +230,24 @@ class MissingProfilesPageHandler(tornado.web.RequestHandler):
             videos_cards=[c for c in cards if c["kind"] == "videos"],
             texts_cards=[c for c in cards if c["kind"] == "texts"],
             is_authenticated=bool(self.current_user),
+        )
+
+
+class MissingPersonCreatePageHandler(SessionAwareHandler):
+    async def get(self):
+        if not self.current_user:
+            self.redirect("/login")
+            return
+
+        settings = get_settings()
+
+        self.render(
+            "missing_person_create.html",
+            is_authenticated=True,
+            current_section="crear",
+            static_version=(
+              "20260409-6"
+                if settings.app_env == "production"
+                else "dev"
+            ),
         )

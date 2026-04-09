@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 import asyncio
+import mimetypes
 from uuid import uuid4
 
 from bson import ObjectId
@@ -297,3 +298,74 @@ async def process_next_media_asset(db, *, backend: str = "local", settings: Sett
     except Exception as exc:
         await mark_media_asset_failed(db, asset_id=asset["_id"], reason=str(exc))
         raise
+
+
+_ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "image/gif": ".gif",
+}
+
+
+def _resolve_image_extension(filename: str, content_type: str) -> str:
+    normalized = (content_type or "").strip().lower()
+    if normalized in _ALLOWED_IMAGE_TYPES:
+        return _ALLOWED_IMAGE_TYPES[normalized]
+
+    guessed, _ = mimetypes.guess_type(filename)
+    guessed = (guessed or "").lower()
+    if guessed in _ALLOWED_IMAGE_TYPES:
+        return _ALLOWED_IMAGE_TYPES[guessed]
+
+    raise ValueError("unsupported_image_type")
+
+
+async def upload_public_image(
+    *,
+    file_bytes: bytes,
+    filename: str,
+    content_type: str,
+    settings: Settings | None = None,
+) -> dict:
+    settings = settings or get_settings()
+    extension = _resolve_image_extension(filename, content_type)
+    object_key = f"images/{uuid4().hex}{extension}"
+
+    if settings.media_backend.lower() == "gcs":
+        if storage is None:
+            raise RuntimeError("google_cloud_storage_not_installed")
+        if not settings.gcs_bucket:
+            raise RuntimeError("missing_gcs_bucket")
+
+        client = storage.Client(project=settings.gcs_project_id or None)
+        bucket = client.bucket(settings.gcs_bucket)
+        blob = bucket.blob(object_key)
+        blob.upload_from_string(file_bytes, content_type=content_type)
+        try:
+            blob.make_public()
+        except Exception:
+            # Uniform bucket-level access may block object ACLs.
+            # In that case the URL still works if bucket IAM grants read.
+            pass
+
+        return {
+            "backend": "gcs",
+            "object_key": object_key,
+            "url": (
+                "https://storage.googleapis.com/"
+                f"{settings.gcs_bucket}/{object_key}"
+            ),
+        }
+
+    local_root = Path(settings.media_local_root)
+    target = local_root / object_key
+    target.parent.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(target.write_bytes, file_bytes)
+
+    base_url = settings.media_public_base_url.rstrip("/")
+    return {
+        "backend": "local",
+        "object_key": object_key,
+        "url": f"{base_url}/{object_key}",
+    }

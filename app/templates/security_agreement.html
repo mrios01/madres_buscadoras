@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Acuerdo de Seguridad - Madres Buscadoras" />
+    <title>Acuerdo de Seguridad | Madres Buscadoras</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Space+Grotesk:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/layout.css" />
+    <style>
+      body {
+        background: linear-gradient(135deg, #f5e6f0 0%, #fff9fc 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .security-agreement-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        max-width: 700px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(212, 83, 143, 0.15);
+      }
+      .security-agreement-container h1 {
+        color: #d4538f;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+      }
+      .security-agreement-container .subtitle {
+        color: #999;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+      .security-agreement-container h3 {
+        color: #d4538f;
+        margin-top: 1.75rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .security-agreement-container ul, .security-agreement-container ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .security-agreement-container li {
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+        font-size: 0.95rem;
+      }
+      .security-agreement-container p {
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+      }
+      .security-agreement-container .final-question {
+        background: #f9f0f5;
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        font-weight: 500;
+        text-align: center;
+        color: #d4538f;
+      }
+      .agreement-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        justify-content: center;
+      }
+      .agreement-buttons button {
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .btn-decline {
+        background: #e8e8e8;
+        color: #666;
+      }
+      .btn-decline:hover {
+        background: #d0d0d0;
+      }
+      .btn-agree {
+        background: #d4538f;
+        color: white;
+      }
+      .btn-agree:hover {
+        background: #b93872;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(212, 83, 143, 0.3);
+      }
+      .content-scroll {
+        max-height: 65vh;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="security-agreement-container">
+      <h1>Acuerdo de Seguridad Operativa</h1>
+      <p class="subtitle"><strong>Plataforma de Coordinación - Madres Buscadoras</strong></p>
+
+      <div class="content-scroll">
+        <p>
+          <strong>Bienvenida/o a la plataforma.</strong> Antes de continuar, debes comprender y aceptar nuestros compromisos de seguridad 
+          y privacidad con tu colectivo y con las familias que servimos.
+        </p>
+
+        <h3>Lo que Prometemos</h3>
+        <ul>
+          <li><strong>Cero Monetización:</strong> Tus datos nunca serán vendidos, compartidos con anunciantes ni utilizados para fines comerciales.</li>
+          <li><strong>Cifrado Total:</strong> Toda la información operativa se almacena bajo cifrado AES-256.</li>
+          <li><strong>Compartimentación Estricta:</strong> Los datos de "Nivel 2" (ubicaciones, coordenadas activas, reportes anónimos) solo son accesibles a personas autorizadas por tu colectivo.</li>
+          <li><strong>Botón de Pánico:</strong> Si tu dispositivo es confiscado o comprometido, puedes activar un PIN de coacción para borrar acceso local inmediato.</li>
+        </ul>
+
+        <h3>Lo que te Comprometemos a Hacer</h3>
+        <ul>
+          <li><strong>NO tomarás capturas de pantalla</strong> de información de "Nivel 2" (ubicaciones, fosas, coordenadas).</li>
+          <li><strong>NO compartirás información operativa</strong> en redes sociales públicas o canales sin cifrar.</li>
+          <li><strong>Usarás el PIN de coacción únicamente</strong> en casos de riesgo inminente o confiscación forzada.</li>
+          <li><strong>Respetarás la autoridad</strong> de los líderes de tu colectivo en acceso y seguridad.</li>
+        </ul>
+
+        <h3>Responsabilidad Compartida</h3>
+        <p>
+          Esta plataforma es solo infraestructura. No ofrecemos seguridad física en campo. El riesgo operativo 
+          es compartido entre el colectivo, las familias y tú. El acceso puede ser revocado en cualquier momento 
+          si detectamos vulnerabilidad, comportamiento sospechoso, o si tu dispositivo se reporta como comprometido.
+        </p>
+      </div>
+
+      <div class="final-question">
+        ¿Aceptas estos términos de seguridad?
+      </div>
+
+      <div class="agreement-buttons">
+        <button class="btn btn-decline" onclick="declineAgreement()">Rechazar</button>
+        <button class="btn btn-agree" onclick="agreeToSecurity()">Aceptar</button>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      function agreeToSecurity() {
+        fetch('/api/security/acknowledge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ acknowledged: true })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if(data.ok) {
+            window.location.href = '/missing-profiles';
+          } else {
+            alert('Error al guardar el acuerdo. Por favor, intenta de nuevo.');
+          }
+        })
+        .catch(() => alert('Error de conexión. Por favor, intenta de nuevo.'));
+      }
+
+      function declineAgreement() {
+        if(confirm('¿Estás seguro? Serás desconectado de la plataforma.')) {
+          fetch('/auth/logout', { method: 'POST' })
+          .then(() => {
+            window.location.href = '/login';
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

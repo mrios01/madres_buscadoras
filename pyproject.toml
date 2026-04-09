@@ -17,6 +17,7 @@ dependencies = [
   "python-dotenv>=1.0",
   "PyYAML>=6.0",
   "google-cloud-storage>=2.18",
+  "google-cloud-pubsub>=2.23",
   "google-auth>=2.35",
 ]
 

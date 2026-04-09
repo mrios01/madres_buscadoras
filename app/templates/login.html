@@ -7,8 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/login.css" />
+    <link rel="stylesheet" href="/static/css/login.css?v={{ static_version }}" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    {% if recaptcha_site_key %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+    {% end %}
   </head>
   <body>
     <main class="login-shell">
@@ -30,23 +33,52 @@
         <h2>Iniciar sesion</h2>
         <p class="subtext">Accede para publicar y seguir perfiles de busqueda.</p>
 
-        <div
-          id="g_id_onload"
-          data-client_id="{{ google_client_id }}"
-          data-context="signin"
-          data-callback="onGoogleCredential"
-          data-auto_prompt="false"
-        ></div>
-        <div class="g_id_signin" data-type="standard" data-theme="outline"></div>
+        <div class="consent-box" aria-label="Consentimientos obligatorios">
+          <label class="consent-item" for="accept_terms">
+            <input id="accept_terms" type="checkbox" />
+            <span>
+              Acepto los <a href="/terms" target="_blank" rel="noopener">Terminos de Uso</a>.
+            </span>
+          </label>
+          <label class="consent-item" for="accept_privacy">
+            <input id="accept_privacy" type="checkbox" />
+            <span>
+              Acepto el <a href="/privacy" target="_blank" rel="noopener">Aviso de Privacidad</a>.
+            </span>
+          </label>
+          <p class="consent-help">
+            Debes marcar ambas casillas para iniciar sesion o registrarte.
+          </p>
+        </div>
+
+        <div id="gsiContainer" class="gsi-container is-blocked">
+          <div
+            id="g_id_onload"
+            data-client_id="{{ google_client_id }}"
+            data-context="signin"
+            data-callback="onGoogleCredential"
+            data-auto_prompt="false"
+          ></div>
+          <div class="g_id_signin" data-type="standard" data-theme="outline"></div>
+        </div>
 
         <button id="previewButton" class="preview-btn" type="button">
           Entrar a vista previa
         </button>
 
         <p id="status" class="status"></p>
+
+        <p class="legal-links">
+          <a href="/privacy" target="_blank" rel="noopener">Aviso de Privacidad</a>
+          <span aria-hidden="true">|</span>
+          <a href="/terms" target="_blank" rel="noopener">Terminos de Uso</a>
+        </p>
       </section>
     </main>
 
-    <script src="/static/js/login.js"></script>
+    <script>
+      window.APP_RECAPTCHA_SITE_KEY = "{{ recaptcha_site_key }}";
+    </script>
+    <script src="/static/js/login.js?v={{ static_version }}"></script>
   </body>
 </html>

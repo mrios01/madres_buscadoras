@@ -1,6 +1,6 @@
 {% extends "_layout.html" %}
 
-{% block title %}Missing Person Profile{% end %}
+{% block title %}Perfiles de Personas Desaparecidas{% end %}
 
 {% block head %}
 <link rel="stylesheet" href="/static/css/missing_profiles.css" />
@@ -9,123 +9,131 @@
 {% block content %}
 <div class="hero-title text-center">
   <div class="container">
-    <h1 class="display-4">Missing Person Profile</h1>
+    <h1 class="display-4">Perfiles de Personas Desaparecidas</h1>
     <p class="lead">Explora perfiles recientes y actualizaciones comunitarias.</p>
   </div>
 </div>
 
 <section class="container mt-4 mb-5">
-  <div role="tabpanel">
-    <ul class="nav nav-tabs missing-tabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link active"
-          id="images-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#images"
-          type="button"
-          role="tab"
-          aria-controls="images"
-          aria-selected="true"
-        >
-          Images
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link"
-          id="videos-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#videos"
-          type="button"
-          role="tab"
-          aria-controls="videos"
-          aria-selected="false"
-        >
-          Videos
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link"
-          id="texts-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#texts"
-          type="button"
-          role="tab"
-          aria-controls="texts"
-          aria-selected="false"
-        >
-          Textos
-        </button>
-      </li>
-    </ul>
-
-    <div class="tab-content mt-3">
-      <div
-        class="tab-pane fade show active"
-        id="images"
-        role="tabpanel"
-        aria-labelledby="images-tab"
-      >
-        <div class="row g-4">
-          {% for item in images_cards %}
-          <div class="col-12 col-md-6 col-lg-4">
-            <article class="missing-card h-100">
-              <h2>{{ item["title"] }}</h2>
-              <img
-                src="{{ item["image"] }}"
-                alt="{{ item["title"] }}"
-                loading="lazy"
-              />
-              <p>{{ item["description"] }}</p>
-            </article>
+  <div class="mt-3">
+    <div class="row g-4">
+      {% for item in images_cards %}
+      <div class="col-12 col-md-6 col-lg-4">
+        <article class="missing-card h-100">
+          <div class="missing-card-header">
+            <h2>{{ item["title"] }}</h2>
+            <button
+              class="btn-profile-detail"
+              title="Ver perfil completo"
+              data-profile-id="{{ item['profile_id'] }}"
+              data-name="{{ item['title'] }}"
+              data-date="{{ item['date_missing'] }}"
+              data-city="{{ item['city'] }}"
+              data-state="{{ item['state'] }}"
+              data-neighborhood="{{ item['neighborhood'] }}"
+              data-age="{{ item['age'] if item['age'] is not None else '' }}"
+              data-gender="{{ item['gender'] }}"
+              data-height="{{ item['height_cm'] if item['height_cm'] is not None else '' }}"
+              data-weight="{{ item['weight_kg'] if item['weight_kg'] is not None else '' }}"
+              data-marks="{{ ', '.join(item['identifying_marks']) if item['identifying_marks'] else '' }}"
+              data-clothing="{{ item['clothing_last_seen'] }}"
+              data-status="{{ item['status'] }}"
+              data-image="{{ item['image'] }}"
+              onclick="openProfileModal(this)"
+            >+</button>
           </div>
-          {% end %}
-        </div>
-      </div>
-
-      <div
-        class="tab-pane fade"
-        id="videos"
-        role="tabpanel"
-        aria-labelledby="videos-tab"
-      >
-        <div class="row g-4">
-          {% for item in videos_cards %}
-          <div class="col-12 col-lg-6">
-            <article class="missing-card h-100">
-              <h2>{{ item["title"] }}</h2>
-              <img
-                src="{{ item["image"] }}"
-                alt="{{ item["title"] }}"
-                loading="lazy"
-              />
-              <p>{{ item["description"] }}</p>
-            </article>
-          </div>
-          {% end %}
-        </div>
-      </div>
-
-      <div
-        class="tab-pane fade"
-        id="texts"
-        role="tabpanel"
-        aria-labelledby="texts-tab"
-      >
-        {% for item in texts_cards %}
-        <article class="text-update">
-          <h3>{{ item["title"] }}</h3>
+          <img
+            src="{{ item["image"] }}"
+            alt="{{ item["title"] }}"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='/static/img/profile-placeholder.svg';"
+          />
           <p>{{ item["description"] }}</p>
         </article>
-        {% end %}
       </div>
+      {% end %}
     </div>
   </div>
 </section>
+
+<!-- Profile detail modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content profile-modal-content">
+      <div class="modal-header profile-modal-header">
+        <h5 class="modal-title" id="profileModalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-4 text-center">
+            <img id="modalImage" src="" alt="" class="img-fluid profile-modal-img"
+              onerror="this.onerror=null;this.src='/static/img/profile-placeholder.svg';" />
+            <span id="modalStatusBadge" class="badge mt-2 d-block"></span>
+          </div>
+          <div class="col-12 col-md-8">
+            <dl class="profile-modal-dl">
+              <dt>Fecha de desaparición</dt>
+              <dd id="modalDate"></dd>
+              <dt>Edad al momento de desaparecer</dt>
+              <dd id="modalAge"></dd>
+              <dt>Género</dt>
+              <dd id="modalGender"></dd>
+              <dt>Ubicación</dt>
+              <dd id="modalLocation"></dd>
+              <dt>Estatura</dt>
+              <dd id="modalHeight"></dd>
+              <dt>Peso</dt>
+              <dd id="modalWeight"></dd>
+              <dt>Señas particulares</dt>
+              <dd id="modalMarks"></dd>
+              <dt>Vestimenta al momento de desaparecer</dt>
+              <dd id="modalClothing"></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% end %}
 
 {% block scripts %}
-<script src="/static/js/missing_profiles.js"></script>
+<script>
+const STATUS_LABELS = {
+  ACTIVE_SEARCH: "Búsqueda activa",
+  FOUND_ALIVE: "Encontrada/o con vida",
+  FOUND_DECEASED: "Encontrada/o sin vida",
+};
+const STATUS_CLASSES = {
+  ACTIVE_SEARCH: "bg-danger",
+  FOUND_ALIVE: "bg-success",
+  FOUND_DECEASED: "bg-secondary",
+};
+
+function openProfileModal(btn) {
+  const d = btn.dataset;
+  document.getElementById("profileModalLabel").textContent = d.name || "Perfil";
+  document.getElementById("modalImage").src = d.image || "/static/img/profile-placeholder.svg";
+  document.getElementById("modalImage").alt = d.name || "";
+  document.getElementById("modalDate").textContent = d.date || "—";
+  document.getElementById("modalAge").textContent = d.age ? d.age + " años" : "—";
+  document.getElementById("modalGender").textContent = d.gender || "—";
+
+  const parts = [d.neighborhood, d.city, d.state].filter(Boolean);
+  document.getElementById("modalLocation").textContent = parts.join(", ") || "—";
+
+  document.getElementById("modalHeight").textContent = d.height ? d.height + " cm" : "—";
+  document.getElementById("modalWeight").textContent = d.weight ? d.weight + " kg" : "—";
+  document.getElementById("modalMarks").textContent = d.marks || "—";
+  document.getElementById("modalClothing").textContent = d.clothing || "—";
+
+  const badge = document.getElementById("modalStatusBadge");
+  badge.textContent = STATUS_LABELS[d.status] || d.status || "";
+  badge.className = "badge mt-2 d-block " + (STATUS_CLASSES[d.status] || "bg-secondary");
+
+  const modal = new bootstrap.Modal(document.getElementById("profileModal"));
+  modal.show();
+}
+</script>
 {% end %}

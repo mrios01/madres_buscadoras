@@ -28,6 +28,11 @@ body {
   color: #ca3f95;
 }
 
+.logout-button {
+  border: 0;
+  background: transparent;
+}
+
 .footer-label {
   font-weight: 700;
 }

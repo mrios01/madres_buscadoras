@@ -1,0 +1,52 @@
+{% extends "_layout.html" %}
+
+{% block title %}Pizarra Comunitaria{% end %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/pizarra.css?v={{ static_version }}" />
+{% end %}
+
+{% block content %}
+<section class="container chat-shell">
+  <header class="chat-header">
+    <h1>Pizarra Comunitaria</h1>
+    <p>Canal general para coordinacion. Puedes responder mensajes y compartir imagenes.</p>
+  </header>
+
+  <div class="chat-layout">
+    <aside class="chat-meta">
+      <h2>Canal</h2>
+      <p class="channel-name">#general</p>
+      <p class="channel-note">Evita publicar informacion sensible de Nivel 2.</p>
+    </aside>
+
+    <section class="chat-panel">
+      <div id="chatStatus" class="chat-status" role="status" aria-live="polite"></div>
+      <div id="replyBanner" class="reply-banner is-hidden">
+        <div>
+          <strong>Respondiendo a:</strong>
+          <span id="replyPreview"></span>
+        </div>
+        <button id="clearReply" type="button">Cancelar</button>
+      </div>
+
+      <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+
+      <form id="chatComposer" class="chat-composer" novalidate>
+        <textarea id="chatText" rows="3" placeholder="Escribe tu mensaje..."></textarea>
+
+        <div class="composer-actions">
+          <label class="file-label" for="chatImage">Adjuntar imagen</label>
+          <input id="chatImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
+          <span id="imageInfo" class="image-info"></span>
+          <button id="sendBtn" type="submit">Enviar</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</section>
+{% end %}
+
+{% block scripts %}
+<script src="/static/js/pizarra.js?v={{ static_version }}"></script>
+{% end %}

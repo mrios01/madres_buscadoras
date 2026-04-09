@@ -54,6 +54,83 @@
 .missing-card p {
   margin-top: 0.75rem;
   color: #704f65;
+
+.missing-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.missing-card-header h2 {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.btn-profile-detail {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid #ca5498;
+  background: transparent;
+  color: #ca5498;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-profile-detail:hover,
+.btn-profile-detail:focus {
+  background: #ca5498;
+  color: #fff;
+  outline: none;
+}
+
+/* Profile modal */
+.profile-modal-content {
+  border: 1px solid #ead3e2;
+  border-radius: 12px;
+}
+
+.profile-modal-header {
+  background: linear-gradient(90deg, #e99ccc 0%, #d96ab4 100%);
+  color: #4e2453;
+  border-radius: 11px 11px 0 0;
+}
+
+.profile-modal-header .modal-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+}
+
+.profile-modal-img {
+  border-radius: 8px;
+  border: 1px solid #ead3e2;
+  max-height: 260px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.profile-modal-dl dt {
+  font-weight: 600;
+  color: #7a3a68;
+  margin-top: 0.65rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.profile-modal-dl dd {
+  color: #333;
+  margin-bottom: 0;
+}
 }
 
 .text-update {
