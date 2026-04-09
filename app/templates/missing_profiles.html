@@ -1,0 +1,131 @@
+{% extends "_layout.html" %}
+
+{% block title %}Missing Person Profile{% end %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/missing_profiles.css" />
+{% end %}
+
+{% block content %}
+<div class="hero-title text-center">
+  <div class="container">
+    <h1 class="display-4">Missing Person Profile</h1>
+    <p class="lead">Explora perfiles recientes y actualizaciones comunitarias.</p>
+  </div>
+</div>
+
+<section class="container mt-4 mb-5">
+  <div role="tabpanel">
+    <ul class="nav nav-tabs missing-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="images-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#images"
+          type="button"
+          role="tab"
+          aria-controls="images"
+          aria-selected="true"
+        >
+          Images
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="videos-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#videos"
+          type="button"
+          role="tab"
+          aria-controls="videos"
+          aria-selected="false"
+        >
+          Videos
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="texts-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#texts"
+          type="button"
+          role="tab"
+          aria-controls="texts"
+          aria-selected="false"
+        >
+          Textos
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+      <div
+        class="tab-pane fade show active"
+        id="images"
+        role="tabpanel"
+        aria-labelledby="images-tab"
+      >
+        <div class="row g-4">
+          {% for item in images_cards %}
+          <div class="col-12 col-md-6 col-lg-4">
+            <article class="missing-card h-100">
+              <h2>{{ item["title"] }}</h2>
+              <img
+                src="{{ item["image"] }}"
+                alt="{{ item["title"] }}"
+                loading="lazy"
+              />
+              <p>{{ item["description"] }}</p>
+            </article>
+          </div>
+          {% end %}
+        </div>
+      </div>
+
+      <div
+        class="tab-pane fade"
+        id="videos"
+        role="tabpanel"
+        aria-labelledby="videos-tab"
+      >
+        <div class="row g-4">
+          {% for item in videos_cards %}
+          <div class="col-12 col-lg-6">
+            <article class="missing-card h-100">
+              <h2>{{ item["title"] }}</h2>
+              <img
+                src="{{ item["image"] }}"
+                alt="{{ item["title"] }}"
+                loading="lazy"
+              />
+              <p>{{ item["description"] }}</p>
+            </article>
+          </div>
+          {% end %}
+        </div>
+      </div>
+
+      <div
+        class="tab-pane fade"
+        id="texts"
+        role="tabpanel"
+        aria-labelledby="texts-tab"
+      >
+        {% for item in texts_cards %}
+        <article class="text-update">
+          <h3>{{ item["title"] }}</h3>
+          <p>{{ item["description"] }}</p>
+        </article>
+        {% end %}
+      </div>
+    </div>
+  </div>
+</section>
+{% end %}
+
+{% block scripts %}
+<script src="/static/js/missing_profiles.js"></script>
+{% end %}
